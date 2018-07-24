@@ -16,6 +16,9 @@
     # can be something like: https://ci.myapp.com
     export CI_URL=myurl
 
+    # set it up on github.com for your webhook
+    export GITHUB_SECRET=mygitsecret
+
     ```
 
 1. Update or create your own ```run_tests.sh``` and give it run permissions:
