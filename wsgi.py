@@ -18,8 +18,16 @@ def push():
             status=403,
             mimetype='application/json',
         )
+    secret = os.environ.get('GITHUB_SECRET')
+    if not secret:
+        return Response(
+            json.dumps({'message': 'missing secret environment variable'}),
+            status=403,
+            mimetype='application/json',
+        )
     pull_request = request.get_json()
-    if get_signature(json.dumps(pull_request, separators=(',', ':'))) != signature:
+    payload = json.dumps(pull_request, separators=(',', ':'))
+    if get_signature(secret, payload) != signature:
         return Response(
             json.dumps({'message': 'bad credentials'}),
             status=403,
@@ -77,5 +85,5 @@ def health_check():
     return Response('', status=200)
 
 
-def get_signature(payload):
-    return 'sha1=' + HMAC(bytes(os.environ.get('GITHUB_SECRET'), 'utf-8'), bytes(payload, 'utf-8'), hashlib.sha1).hexdigest()
+def get_signature(secret, payload):
+    return 'sha1=' + HMAC(bytes(secret, 'utf-8'), bytes(payload, 'utf-8'), hashlib.sha1).hexdigest()
