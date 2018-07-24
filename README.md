@@ -27,3 +27,14 @@
     chmod +x run_tests.sh
 
     ```
+
+1. Start nginx:
+```bash
+docker run \
+-p 8080:80 \
+--name ci-nginx \
+-v $HOME/buildMessages:/buildMessages \
+-v $(pwd)/nginx.conf:/etc/nginx/nginx.conf:ro \
+-d nginx
+
+```

@@ -68,7 +68,7 @@ def push():
 
     with open(script_out_file, 'w') as outfile:
         pid = Popen(
-            f'./run_tests.sh --gitCommit={commit_sha} --gitToken={git_token} --pullRequestNumber={pull_request_number}'.split(),
+            f'../run_tests.sh --gitCommit={commit_sha} --gitToken={git_token} --pullRequestNumber={pull_request_number}'.split(),
             stdout=outfile,
             stderr=STDOUT,
         ).pid
