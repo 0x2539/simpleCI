@@ -19,6 +19,9 @@
     # set it up on github.com for your webhook
     export GITHUB_SECRET=mygitsecret
 
+    # must be the following format: "<repo_owner>/<repo_name>"
+    export REPO_PATH=alexbuicescu/simpleCI
+
     ```
 
 1. Update or create your own ```run_tests.sh``` and give it run permissions:
