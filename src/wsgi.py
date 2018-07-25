@@ -58,7 +58,7 @@ def push():
 
     script_out_folder = f"{str(Path.home())}/buildMessages"
     os.makedirs(script_out_folder, exist_ok=True)
-    script_out_file = f"{script_out_folder}/{commit_sha}.txt"
+    script_out_file = f"{script_out_folder}/{commit_sha}-debug.txt"
     git_token = os.environ.get('gitToken')
     if not git_token:
         with open(script_out_file, 'w') as outfile:
