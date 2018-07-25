@@ -7,8 +7,8 @@
 
 1. Set the necessary environment variables:
     ```bash
-    # needed to run the shell script
-    chmod +x run_tests.sh
+    mkdir ~/buildMessages/
+    sudo chmod -R 777 ~/buildMessages/
 
     # github access token
     export gitToken=123
@@ -33,9 +33,11 @@
 
 1. Start nginx:
     ```bash
+    cd simpleCI
+
     docker run \
     --rm \
-    -p 8080:80 \
+    -p 8001:80 \
     --name ci-nginx \
     -v $HOME/buildMessages:/buildMessages:ro \
     -v $HOME/.htpasswd:/.htpasswd:ro \
