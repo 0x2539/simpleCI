@@ -29,12 +29,19 @@
     ```
 
 1. Start nginx:
-```bash
-docker run \
--p 8080:80 \
---name ci-nginx \
--v $HOME/buildMessages:/buildMessages \
--v $(pwd)/nginx.conf:/etc/nginx/nginx.conf:ro \
--d nginx
+    ```bash
+    docker run \
+    -p 8080:80 \
+    --name ci-nginx \
+    -v $HOME/buildMessages:/buildMessages:ro \
+    -v $HOME/.htpasswd:/.htpasswd:ro \
+    -v $(pwd)/nginx.conf:/etc/nginx/nginx.conf:ro \
+    -d nginx
 
-```
+    ```
+
+1. Add a new user and password for **nginx** (replace <username> with the actual username, see more [here](http://www.genecasanova.com/labs/security-online/nginx-password-authentication.html#.W1g7RNgzZN0)):
+    ```bash
+    printf "<username>:`openssl passwd -apr1`\n" >> ~/.htpasswd
+
+    ```
