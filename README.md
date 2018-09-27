@@ -22,6 +22,9 @@
     # must be the following format: "<repo_owner>/<repo_name>"
     export REPO_PATH=alexbuicescu/simpleCI
 
+    # variable for sync/async
+    export SYNC=true
+
     ```
 
 1. Update or create your own ```run_tests.sh``` and give it run permissions:

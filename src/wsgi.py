@@ -5,9 +5,86 @@ from pathlib import Path
 from subprocess import Popen, STDOUT
 from hmac import HMAC
 import hashlib
+from tests_queue import get_commit_pr_queue_singleton
+from commit_pr_model import CommitPrModel
 
+singleton = get_commit_pr_queue_singleton()
 app = Flask(__name__)
 
+@app.route('/keep-latest', methods=['POST'])
+def keep_latest():
+    pr_dict = {}
+    to_remove_commits = []
+
+    for commit_pr in singleton.requests_queue:
+        missing_key = commit_pr.pull_request_number not in pr_dict
+        is_newer_timestamp = missing_key or commit_pr.timestamp > pr_dict[commit_pr.pull_request_number]
+
+        if missing_key or is_newer_timestamp:
+            pr_dict[commit_pr.pull_request_number] = commit_pr.timestamp
+
+    for commit_pr in singleton.requests_queue:
+        if pr_dict[commit_pr.pull_request_number] != commit_pr.timestamp:
+            to_remove_commits.append(commit_pr)
+
+    for commit_pr in to_remove_commits:
+        singleton.remove_obj(commit_pr)
+
+    serialized_commit_pr_list = [commit_pr.serialize() for commit_pr in to_remove_commits]
+
+    return Response(json.dumps({'removed': serialized_commit_pr_list}))
+
+@app.route('/move-commit-to-front', methods=['POST'])
+def move_to_front():
+    commit = request.get_json()
+    to_remove = None
+
+    for commit_pr in singleton.requests_queue:
+        if commit['sha'] == commit_pr.commit_sha:
+            to_remove = commit_pr
+
+    if not to_remove is None:
+        singleton.remove_obj(to_remove)
+        singleton.prioritize_obj(to_remove)
+
+        return Response(json.dumps({'message': 'Prioritized commit ' + to_remove.commit_sha}))
+
+    return Response(json.dumps({'message': 'No commit found. No changes were made to the queue'}))
+
+
+@app.route('/remove-pull-request', methods=['POST'])
+def remove_pr():
+    pr_list = request.get_json()['pull_requests']
+    to_remove_commits = []
+
+    for pr_no in pr_list:
+        for commit_pr in singleton.requests_queue:
+            if pr_no == commit_pr.pull_request_number:
+                to_remove_commits.append(commit_pr)
+
+    for commit_pr in to_remove_commits:
+        singleton.remove_obj(commit_pr)
+
+    serialized_commit_pr_list = [commit_pr.serialize() for commit_pr in to_remove_commits]
+
+    return Response(json.dumps({'removed': serialized_commit_pr_list}))
+
+@app.route('/remove-commits', methods=['POST'])
+def remove_commits():
+    commit_list = request.get_json()['commits']
+    to_remove_commits = []
+
+    for commit_sha in commit_list:
+        for commit_pr in singleton.requests_queue:
+            if commit_sha == commit_pr.commit_sha:
+                to_remove_commits.append(commit_pr)
+
+    for commit in to_remove_commits:
+        singleton.remove_obj(commit)
+
+    serialized_commit_pr_list  = [commit_pr.serialize() for commit_pr in to_remove_commits]
+
+    return Response(json.dumps({'removed': serialized_commit_pr_list }))
 
 @app.route('/pull-request', methods=['POST'])
 def push():
@@ -27,6 +104,7 @@ def push():
         )
     pull_request = request.get_json()
     payload = json.dumps(pull_request, separators=(',', ':'))
+
     if get_signature(secret, payload) != signature:
         return Response(
             json.dumps({'message': 'bad credentials'}),
@@ -65,6 +143,16 @@ def push():
             outfile.write(
                 "git access token is missing, set it as environment variable or pass it as argument ('./run_tests.sh --gitToken=123' or 'export gitToken=123')")
         return Response(json.dumps({'message': "git access token not found"}), status=422, mimetype='application/json')
+
+    if os.environ.get('SYNC') == "true":
+        commit_pr = CommitPrModel(commit_sha, pull_request_number, script_out_file)
+        singleton.add_commit_pr(commit_pr)
+
+        return Response(
+            json.dumps({'message': "Added to queue: " + str(commit_pr.commit_sha)}),
+            status=200,
+            mimetype='application/json',
+        )
 
     with open(script_out_file, 'w') as outfile:
         pid = Popen(
