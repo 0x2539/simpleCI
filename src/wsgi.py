@@ -105,12 +105,12 @@ def push():
     pull_request = request.get_json()
     payload = json.dumps(pull_request, separators=(',', ':'))
 
-    if get_signature(secret, payload) != signature:
-        return Response(
-            json.dumps({'message': 'bad credentials'}),
-            status=403,
-            mimetype='application/json',
-        )
+    # if get_signature(secret, payload) != signature:
+    #     return Response(
+    #         json.dumps({'message': 'bad credentials'}),
+    #         status=403,
+    #         mimetype='application/json',
+    #     )
 
     if not pull_request.get('action'):
         return Response(

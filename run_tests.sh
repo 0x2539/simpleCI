@@ -59,22 +59,28 @@ curl -X POST \
 }'
 
 repoFolder="${HOME}/builds/cex-${gitCommit}"
+frontRepoFolder="${HOME}/builds/cex-${gitCommit}/src/crypto-frontend"
+
 rm -rf ${repoFolder}
 mkdir -p ${repoFolder}
-
-
 echo "git clone https://${gitToken}@github.com/${REPO_PATH} ${repoFolder}"
 git clone https://${gitToken}@github.com/${REPO_PATH} ${repoFolder}
-
 echo "cd ${repoFolder}"
 cd ${repoFolder}
-
 echo "git checkout ${gitCommit}"
 git checkout ${gitCommit}
 
+rm -rf ${frontRepoFolder}
+mkdir -p ${frontRepoFolder}
+echo "git clone https://gitlab.com/${FRONT_REPO_PATH} --branch appium_selenium_integration --single-branch ${frontRepoFolder}"
+git clone https://gitlab.com/${FRONT_REPO_PATH} --branch appium_selenium_integration --single-branch ${frontRepoFolder}
+echo "cd ${frontRepoFolder}"
+cd ${frontRepoFolder}
+echo "git checkout appium_selenium_integration"
+git checkout appium_selenium_integration
 
-echo "python3 ${repoFolder}/src/buildScripts/run_tests.py > ${HOME}/buildMessages/${gitCommit}.txt"
-if ! python3 ${repoFolder}/src/buildScripts/run_tests.py > ${HOME}/buildMessages/${gitCommit}.txt & echo $! > ${HOME}/buildMessages/${gitCommit}-pid.txt ; then
+echo "python3 ${repoFolder}/src/buildScripts/run_integration_tests.py ${gitCommit} devclient dev > ${HOME}/buildMessages/${gitCommit}.txt"
+if ! python3 ${repoFolder}/src/buildScripts/run_integration_tests.py ${gitCommit} devclient dev > ${HOME}/buildMessages/${gitCommit}.txt & echo $! > ${HOME}/buildMessages/${gitCommit}-pid.txt ; then
 
 curl -X POST \
   https://api.github.com/repos/${REPO_PATH}/statuses/${gitCommit} \
@@ -104,6 +110,6 @@ curl -X POST \
 
 fi
 
-rm -rf ${repoFolder}
+#rm -rf ${repoFolder}
 
 echo "ended at $(dateString) ($(timestamp)) (duration: $(($(timestamp)-${startTs})) seconds)"
