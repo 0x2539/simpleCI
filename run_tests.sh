@@ -79,21 +79,39 @@ cd ${frontRepoFolder}
 echo "git checkout appium_selenium_integration"
 git checkout appium_selenium_integration
 
-echo "python3 ${repoFolder}/src/buildScripts/run_integration_tests.py ${gitCommit} devclient dev > ${HOME}/buildMessages/${gitCommit}.txt"
-if ! python3 ${repoFolder}/src/buildScripts/run_integration_tests.py ${gitCommit} devclient dev > ${HOME}/buildMessages/${gitCommit}.txt & echo $! > ${HOME}/buildMessages/${gitCommit}-pid.txt ; then
+touch ${HOME}/buildMessages/${gitCommit}/log.txt
 
-curl -X POST \
-  https://api.github.com/repos/${REPO_PATH}/statuses/${gitCommit} \
-  -H "Authorization: token ${gitToken}" \
-  -H 'Cache-Control: no-cache' \
-  -H 'Content-Type: application/json' \
-  -d '{
-  "state": "error",
-  "target_url": "'${CI_URL}'/buildMessages/'${gitCommit}'.txt",
-  "description": "Build failed",
-  "context": "continuous-integration/ce"
-}'
+echo "python3 ${repoFolder}/src/buildScripts/run_integration_tests.py ${gitCommit} devclient dev > ${HOME}/buildMessages/${gitCommit}/log.txt"
+if ! python3 ${repoFolder}/src/buildScripts/run_integration_tests.py ${gitCommit} devclient dev > ${HOME}/buildMessages/${gitCommit}/log.txt; then
+    if [ -f "${repoFolder}/src/buildScripts/error_file" ]; then
+    	foo="`cat ${repoFolder}/src/buildScripts/error_file`"
+    	echo "${repoFolder}/src/buildScripts/error_file ${HOME}/buildMessages/${gitCommit}"
+        cp ${repoFolder}/src/buildScripts/error_file ${HOME}/buildMessages/${gitCommit}
 
+        curl -X POST \
+          https://api.github.com/repos/${REPO_PATH}/statuses/${gitCommit} \
+          -H "Authorization: token ${gitToken}" \
+          -H 'Cache-Control: no-cache' \
+          -H 'Content-Type: application/json' \
+          -d '{
+          "state": "error",
+          "target_url": "'${CI_URL}'/buildMessages/'${gitCommit}'.txt",
+          "description": "'${foo}'",
+          "context": "continuous-integration/ce"
+        }'
+    else
+       curl -X POST \
+          https://api.github.com/repos/${REPO_PATH}/statuses/${gitCommit} \
+          -H "Authorization: token ${gitToken}" \
+          -H 'Cache-Control: no-cache' \
+          -H 'Content-Type: application/json' \
+          -d '{
+          "state": "error",
+          "target_url": "'${CI_URL}'/buildMessages/'${gitCommit}'.txt",
+          "description": "Build failed",
+          "context": "continuous-integration/ce"
+        }'
+    fi
 else
 
 curl -X POST \
@@ -108,8 +126,12 @@ curl -X POST \
   "context": "continuous-integration/ce"
 }'
 
+echo "cp -r ${repoFolder}/src/buildScripts/screenshots ${HOME}/buildMessages/${gitCommit}"
+cp -r ${repoFolder}/src/buildScripts/screenshots ${HOME}/buildMessages/${gitCommit}
+
 fi
 
-#rm -rf ${repoFolder}
+echo "rm -rf ${repoFolder}"
+rm -rf ${repoFolder}
 
 echo "ended at $(dateString) ($(timestamp)) (duration: $(($(timestamp)-${startTs})) seconds)"
