@@ -74,7 +74,7 @@ git checkout ${gitCommit}
 
 
 echo "python3 ${repoFolder}/src/buildScripts/run_tests.py > ${HOME}/buildMessages/${gitCommit}.txt"
-if ! python3 ${repoFolder}/src/buildScripts/run_tests.py > ${HOME}/buildMessages/${gitCommit}.txt & echo $! > ${HOME}/buildMessages/${gitCommit}-pid.txt ; then
+if ! python3 ${repoFolder}/src/buildScripts/run_tests.py > ${HOME}/buildMessages/${gitCommit}.txt ; then
 
 curl -X POST \
   https://api.github.com/repos/${REPO_PATH}/statuses/${gitCommit} \
