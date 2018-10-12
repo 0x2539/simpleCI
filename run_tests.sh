@@ -108,7 +108,7 @@ if ! python3 ${repoFolder}/src/buildScripts/run_integration_tests.py ${gitCommit
           -d '{
           "state": "error",
           "target_url": "'${CI_URL}'/buildMessages/'${gitCommit}'.txt",
-          "description": "Build failed",
+          "description": "Integration tests failed or timed out",
           "context": "continuous-integration/ce"
         }'
     fi
@@ -122,7 +122,7 @@ curl -X POST \
   -d '{
   "state": "success",
   "target_url": "'${CI_URL}'/buildMessages/'${gitCommit}'.txt",
-  "description": "Build success",
+  "description": "Integration tests passed",
   "context": "continuous-integration/ce"
 }'
 
