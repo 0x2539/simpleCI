@@ -47,11 +47,12 @@ class __CommitPrQueueThread(object):
                     "git access token is missing, set it as environment variable or pass it as argument ('./run_tests.sh --gitToken=123' or 'export gitToken=123')")
 
         with open(commit_pr_model.script_out_file, 'w') as outfile:
-            Popen(
+            p = Popen(
                 f'../run_tests.sh --gitCommit={commit_pr_model.commit_sha} --gitToken={git_token} --pullRequestNumber={commit_pr_model.pull_request_number}'.split(),
                 stdout=outfile,
                 stderr=STDOUT,
             )
+            p.communicate()
 
     def __start_job_thread(self):
         """
