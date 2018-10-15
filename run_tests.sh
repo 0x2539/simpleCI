@@ -148,10 +148,21 @@ if [ $status -eq 1 ]; then
     }'
 elif [ $status -eq 2 ]; then
     if [ -f "${repoFolder}/src/buildScripts/error_file" ]; then
-        foo=$(<${repoFolder}/src/buildScripts/error_file)
+        foo=$(cat ${repoFolder}/src/buildScripts/error_file | tr -dc '[:alnum:]:,')
         echo "${repoFolder}/src/buildScripts/error_file ${HOME}/buildMessages/${gitCommit}"
         cp ${repoFolder}/src/buildScripts/error_file ${HOME}/buildMessages/${gitCommit}
 
+        curl -X POST \
+          https://api.github.com/repos/${REPO_PATH}/statuses/${gitCommit} \
+          -H "Authorization: token ${gitToken}" \
+          -H 'Cache-Control: no-cache' \
+          -H 'Content-Type: application/json' \
+          -d '{
+          "state": "success",
+          "target_url": "'${CI_URL}'/buildMessages/'${gitCommit}'.txt",
+          "description": "Build successful",
+          "context": "continuous-integration/ce"
+        }'
         curl -X POST \
           https://api.github.com/repos/${REPO_PATH}/statuses/${gitCommit} \
           -H "Authorization: token ${gitToken}" \
@@ -177,6 +188,28 @@ elif [ $status -eq 2 ]; then
         }'
     fi
 elif [ $status -eq 3 ]; then
+    curl -X POST \
+          https://api.github.com/repos/${REPO_PATH}/statuses/${gitCommit} \
+          -H "Authorization: token ${gitToken}" \
+          -H 'Cache-Control: no-cache' \
+          -H 'Content-Type: application/json' \
+          -d '{
+          "state": "success",
+          "target_url": "'${CI_URL}'/buildMessages/'${gitCommit}'.txt",
+          "description": "Build successful",
+          "context": "continuous-integration/ce"
+        }'
+    curl -X POST \
+          https://api.github.com/repos/${REPO_PATH}/statuses/${gitCommit} \
+          -H "Authorization: token ${gitToken}" \
+          -H 'Cache-Control: no-cache' \
+          -H 'Content-Type: application/json' \
+          -d '{
+          "state": "success",
+          "target_url": "'${CI_URL}'/buildMessages/'${gitCommit}'.txt",
+          "description": "Health checks passed",
+          "context": "continuous-integration/health_checks"
+        }'
     curl -X POST \
       https://api.github.com/repos/${REPO_PATH}/statuses/${gitCommit} \
       -H "Authorization: token ${gitToken}" \
