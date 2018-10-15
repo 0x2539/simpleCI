@@ -58,6 +58,30 @@ curl -X POST \
   "context": "continuous-integration/ce"
 }'
 
+curl -X POST \
+  https://api.github.com/repos/${REPO_PATH}/statuses/${gitCommit} \
+  -H "Authorization: token ${gitToken}" \
+  -H 'Cache-Control: no-cache' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "state": "pending",
+  "target_url": "'${CI_URL}'/buildMessages/'${gitCommit}'.txt",
+  "description": "Health checks pending",
+  "context": "continuous-integration/health_checks"
+}'
+
+curl -X POST \
+  https://api.github.com/repos/${REPO_PATH}/statuses/${gitCommit} \
+  -H "Authorization: token ${gitToken}" \
+  -H 'Cache-Control: no-cache' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "state": "pending",
+  "target_url": "'${CI_URL}'/buildMessages/'${gitCommit}'.txt",
+  "description": "Test execution pending",
+  "context": "continuous-integration/tests_appium_selenium"
+}'
+
 repoFolder="${HOME}/builds/cex-${gitCommit}"
 frontRepoFolder="${HOME}/builds/cex-${gitCommit}/src/crypto-frontend"
 
@@ -80,12 +104,52 @@ echo "git checkout appium_selenium_integration"
 git checkout appium_selenium_integration
 
 touch ${HOME}/buildMessages/${gitCommit}/log.txt
+set +e
 
 echo "python3 ${repoFolder}/src/buildScripts/run_integration_tests.py ${gitCommit} devclient dev > ${HOME}/buildMessages/${gitCommit}/log.txt"
-if ! python3 ${repoFolder}/src/buildScripts/run_integration_tests.py ${gitCommit} devclient dev > ${HOME}/buildMessages/${gitCommit}/log.txt; then
+python3 ${repoFolder}/src/buildScripts/run_integration_tests.py ${gitCommit} devclient dev > ${HOME}/buildMessages/${gitCommit}/log.txt;
+status=$?
+
+if [ $status -eq 1 ]; then
+    curl -X POST \
+      https://api.github.com/repos/${REPO_PATH}/statuses/${gitCommit} \
+      -H "Authorization: token ${gitToken}" \
+      -H 'Cache-Control: no-cache' \
+      -H 'Content-Type: application/json' \
+      -d '{
+      "state": "error",
+      "target_url": "'${CI_URL}'/buildMessages/'${gitCommit}'.txt",
+      "description": "Build failed",
+      "context": "continuous-integration/ce"
+    }'
+
+    curl -X POST \
+      https://api.github.com/repos/${REPO_PATH}/statuses/${gitCommit} \
+      -H "Authorization: token ${gitToken}" \
+      -H 'Cache-Control: no-cache' \
+      -H 'Content-Type: application/json' \
+      -d '{
+      "state": "error",
+      "target_url": "'${CI_URL}'/buildMessages/'${gitCommit}'.txt",
+      "description": "Health checks failed",
+      "context": "continuous-integration/health_checks"
+    }'
+
+    curl -X POST \
+      https://api.github.com/repos/${REPO_PATH}/statuses/${gitCommit} \
+      -H "Authorization: token ${gitToken}" \
+      -H 'Cache-Control: no-cache' \
+      -H 'Content-Type: application/json' \
+      -d '{
+      "state": "error",
+      "target_url": "'${CI_URL}'/buildMessages/'${gitCommit}'.txt",
+      "description": "Integration tests failed",
+      "context": "continuous-integration/tests_appium_selenium"
+    }'
+elif [ $status -eq 2 ]; then
     if [ -f "${repoFolder}/src/buildScripts/error_file" ]; then
-    	foo="`cat ${repoFolder}/src/buildScripts/error_file`"
-    	echo "${repoFolder}/src/buildScripts/error_file ${HOME}/buildMessages/${gitCommit}"
+        foo=$(<${repoFolder}/src/buildScripts/error_file)
+        echo "${repoFolder}/src/buildScripts/error_file ${HOME}/buildMessages/${gitCommit}"
         cp ${repoFolder}/src/buildScripts/error_file ${HOME}/buildMessages/${gitCommit}
 
         curl -X POST \
@@ -96,11 +160,11 @@ if ! python3 ${repoFolder}/src/buildScripts/run_integration_tests.py ${gitCommit
           -d '{
           "state": "error",
           "target_url": "'${CI_URL}'/buildMessages/'${gitCommit}'.txt",
-          "description": "'${foo}'",
-          "context": "continuous-integration/ce"
+          "description": '${foo}',
+          "context": "continuous-integration/health_checks"
         }'
-    else
-       curl -X POST \
+
+        curl -X POST \
           https://api.github.com/repos/${REPO_PATH}/statuses/${gitCommit} \
           -H "Authorization: token ${gitToken}" \
           -H 'Cache-Control: no-cache' \
@@ -108,27 +172,59 @@ if ! python3 ${repoFolder}/src/buildScripts/run_integration_tests.py ${gitCommit
           -d '{
           "state": "error",
           "target_url": "'${CI_URL}'/buildMessages/'${gitCommit}'.txt",
-          "description": "Integration tests failed or timed out",
-          "context": "continuous-integration/ce"
+          "description": "Integration tests failed",
+          "context": "continuous-integration/tests_appium_selenium"
         }'
     fi
-else
+elif [ $status -eq 3 ]; then
+    curl -X POST \
+      https://api.github.com/repos/${REPO_PATH}/statuses/${gitCommit} \
+      -H "Authorization: token ${gitToken}" \
+      -H 'Cache-Control: no-cache' \
+      -H 'Content-Type: application/json' \
+      -d '{
+      "state": "error",
+      "target_url": "'${CI_URL}'/buildMessages/'${gitCommit}'.txt",
+      "description": "Integration tests failed",
+      "context": "continuous-integration/tests_appium_selenium"
+    }'
+elif [ $status -eq 0 ]; then
+    curl -X POST \
+          https://api.github.com/repos/${REPO_PATH}/statuses/${gitCommit} \
+          -H "Authorization: token ${gitToken}" \
+          -H 'Cache-Control: no-cache' \
+          -H 'Content-Type: application/json' \
+          -d '{
+          "state": "success",
+          "target_url": "'${CI_URL}'/buildMessages/'${gitCommit}'.txt",
+          "description": "Build successful",
+          "context": "continuous-integration/ce"
+        }'
+    curl -X POST \
+          https://api.github.com/repos/${REPO_PATH}/statuses/${gitCommit} \
+          -H "Authorization: token ${gitToken}" \
+          -H 'Cache-Control: no-cache' \
+          -H 'Content-Type: application/json' \
+          -d '{
+          "state": "success",
+          "target_url": "'${CI_URL}'/buildMessages/'${gitCommit}'.txt",
+          "description": "Health checks passed",
+          "context": "continuous-integration/health_checks"
+        }'
+    curl -X POST \
+          https://api.github.com/repos/${REPO_PATH}/statuses/${gitCommit} \
+          -H "Authorization: token ${gitToken}" \
+          -H 'Cache-Control: no-cache' \
+          -H 'Content-Type: application/json' \
+          -d '{
+          "state": "success",
+          "target_url": "'${CI_URL}'/buildMessages/'${gitCommit}'.txt",
+          "description": "Integration tests passed",
+          "context": "continuous-integration/tests_appium_selenium"
+        }'
 
-curl -X POST \
-  https://api.github.com/repos/${REPO_PATH}/statuses/${gitCommit} \
-  -H "Authorization: token ${gitToken}" \
-  -H 'Cache-Control: no-cache' \
-  -H 'Content-Type: application/json' \
-  -d '{
-  "state": "success",
-  "target_url": "'${CI_URL}'/buildMessages/'${gitCommit}'.txt",
-  "description": "Integration tests passed",
-  "context": "continuous-integration/ce"
-}'
-
-echo "cp -r ${repoFolder}/src/buildScripts/screenshots ${HOME}/buildMessages/${gitCommit}"
-cp -r ${repoFolder}/src/buildScripts/screenshots ${HOME}/buildMessages/${gitCommit}
-
+    echo "cp -r ${repoFolder}/src/buildScripts/screenshots ${HOME}/buildMessages/${gitCommit}"
+    cp -r ${repoFolder}/src/buildScripts/screenshots ${HOME}/buildMessages/${gitCommit}
 fi
 
 echo "rm -rf ${repoFolder}"

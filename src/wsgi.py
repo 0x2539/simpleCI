@@ -1,5 +1,6 @@
 import json
 import os
+import shutil
 from flask import Flask, Response, request
 from pathlib import Path
 from subprocess import Popen, STDOUT
@@ -135,7 +136,10 @@ def push():
     pull_request_number = pull_request['pull_request']['number']
 
     script_out_folder = f"{str(Path.home())}/buildMessages"
-    os.makedirs(script_out_folder, exist_ok=True)
+    if os.path.exists(script_out_folder):
+        shutil.rmtree(script_out_folder)
+
+    os.makedirs(script_out_folder)
     commit_folder = script_out_folder + '/' + commit_sha
     os.makedirs(commit_folder, exist_ok=True)
     Path(commit_folder + '/debug.txt').touch(exist_ok=True)
