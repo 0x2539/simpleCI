@@ -136,14 +136,16 @@ def push():
     pull_request_number = pull_request['pull_request']['number']
 
     script_out_folder = f"{str(Path.home())}/buildMessages"
-    if os.path.exists(script_out_folder):
-        shutil.rmtree(script_out_folder)
+    os.makedirs(script_out_folder, exist_ok=True)
 
-    os.makedirs(script_out_folder)
     commit_folder = script_out_folder + '/' + commit_sha
+
+    if os.path.exists(commit_folder):
+        shutil.rmtree(commit_folder)
+
     os.makedirs(commit_folder, exist_ok=True)
-    Path(commit_folder + '/debug.txt').touch(exist_ok=True)
-    script_out_file = f"{script_out_folder}/{commit_sha}/debug.txt"
+    Path(commit_folder + '/debug').touch(exist_ok=True)
+    script_out_file = f"{script_out_folder}/{commit_sha}/debug"
     git_token = os.environ.get('gitToken')
     if not git_token:
         with open(script_out_file, 'w') as outfile:
