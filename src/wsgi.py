@@ -106,12 +106,12 @@ def push():
     pull_request = request.get_json()
     payload = json.dumps(pull_request, separators=(',', ':'))
 
-    # if get_signature(secret, payload) != signature:
-    #     return Response(
-    #         json.dumps({'message': 'bad credentials'}),
-    #         status=403,
-    #         mimetype='application/json',
-    #     )
+    if get_signature(secret, payload) != signature:
+        return Response(
+            json.dumps({'message': 'bad credentials'}),
+            status=403,
+            mimetype='application/json',
+        )
 
     if not pull_request.get('action'):
         return Response(
@@ -144,7 +144,6 @@ def push():
         shutil.rmtree(commit_folder)
 
     os.makedirs(commit_folder, exist_ok=True)
-    Path(commit_folder + '/debug').touch(exist_ok=True)
     script_out_file = f"{script_out_folder}/{commit_sha}/debug"
     git_token = os.environ.get('gitToken')
     if not git_token:
