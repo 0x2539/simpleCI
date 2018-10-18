@@ -89,13 +89,17 @@ def remove_commits():
 
 @app.route('/pull-request', methods=['POST'])
 def push():
+    print("Intrat")
     signature = request.headers.get('X-Hub-Signature')
+
     if not signature:
         return Response(
             json.dumps({'message': 'missing signature header'}),
             status=403,
             mimetype='application/json',
         )
+    print("Passed signature")
+
     secret = os.environ.get('GITHUB_SECRET')
     if not secret:
         return Response(
@@ -103,6 +107,8 @@ def push():
             status=403,
             mimetype='application/json',
         )
+    print("Passed secret")
+
     pull_request = request.get_json()
     payload = json.dumps(pull_request, separators=(',', ':'))
 
@@ -112,6 +118,7 @@ def push():
             status=403,
             mimetype='application/json',
         )
+    print("Passed signature matching")
 
     if not pull_request.get('action'):
         return Response(
@@ -119,6 +126,7 @@ def push():
             status=200,
             mimetype='application/json',
         )
+
     run_tests = False
     if pull_request['action'] == 'opened':
         run_tests = True
@@ -132,6 +140,8 @@ def push():
             mimetype='application/json',
         )
 
+    print("Passed run_tests")
+
     commit_sha = pull_request['pull_request']['head']['sha']
     pull_request_number = pull_request['pull_request']['number']
 
@@ -143,6 +153,8 @@ def push():
     if os.path.exists(commit_folder):
         shutil.rmtree(commit_folder)
 
+    print("Created commit folder")
+
     os.makedirs(commit_folder, exist_ok=True)
     script_out_file = f"{script_out_folder}/{commit_sha}/debug"
     git_token = os.environ.get('gitToken')
@@ -151,6 +163,8 @@ def push():
             outfile.write(
                 "git access token is missing, set it as environment variable or pass it as argument ('./run_tests.sh --gitToken=123' or 'export gitToken=123')")
         return Response(json.dumps({'message': "git access token not found"}), status=422, mimetype='application/json')
+
+    print("Git token ok")
 
     if os.environ.get('SYNC') == "true":
         commit_pr = CommitPrModel(commit_sha, pull_request_number, script_out_file)
@@ -161,6 +175,8 @@ def push():
             status=200,
             mimetype='application/json',
         )
+
+    print("Running async")
 
     with open(script_out_file, 'w') as outfile:
         pid = Popen(
