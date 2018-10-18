@@ -52,7 +52,7 @@
 
     docker run \
     --rm \
-    -p 8001:80 \
+    -p 80:80 \
     --name ci-nginx \
     -v $HOME/buildMessages:/buildMessages:ro \
     -v $HOME/.htpasswd:/.htpasswd:ro \
