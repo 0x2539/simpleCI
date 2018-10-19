@@ -1,6 +1,6 @@
 import signal
 from collections import deque
-from threading import Thread, Semaphore, Event
+from threading import Thread, Semaphore
 from subprocess import Popen, STDOUT
 import subprocess
 import os
