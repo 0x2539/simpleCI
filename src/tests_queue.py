@@ -1,6 +1,6 @@
 import signal
 from collections import deque
-from threading import Thread, Semaphore, Timer
+from threading import Thread, Semaphore
 from subprocess import Popen, STDOUT
 import subprocess
 import os
@@ -54,13 +54,7 @@ class __CommitPrQueueThread(object):
                 stdout=outfile,
                 stderr=STDOUT,
             )
-
-            timer = Timer(240, p.kill)
-            try:
-                timer.start()
-                p.communicate()
-            finally:
-                timer.cancel()
+            p.communicate()
 
         print('Finished running for commit: ' + commit_pr_model.commit_sha)
 
