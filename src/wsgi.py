@@ -1,13 +1,15 @@
 import json
 import os
 import shutil
-from flask import Flask, Response, request
+from flask import Flask, Response, request, abort, render_template, send_from_directory
 from pathlib import Path
 from subprocess import Popen, STDOUT
 from hmac import HMAC
 import hashlib
 from tests_queue import get_commit_pr_queue_singleton
 from commit_pr_model import CommitPrModel
+from PIL import Image
+from io import StringIO
 
 singleton = get_commit_pr_queue_singleton()
 app = Flask(__name__)
@@ -90,6 +92,7 @@ def remove_commits():
 @app.route('/pull-request', methods=['POST'])
 def push():
     print("Endpoint hit")
+    pull_request = request.get_json()
 
     commit_sha = pull_request['pull_request']['head']['sha']
     pull_request_number = pull_request['pull_request']['number']
@@ -115,7 +118,6 @@ def push():
             mimetype='application/json',
         )
 
-    pull_request = request.get_json()
     payload = json.dumps(pull_request, separators=(',', ':'))
 
     if get_signature(secret, payload) != signature:
@@ -203,6 +205,64 @@ def push():
 @app.route('/health-check', methods=['GET'])
 def health_check():
     return Response('', status=200)
+
+WIDTH = 640
+HEIGHT = 480
+
+@app.route('/<path:filename>')
+def image(filename):
+    try:
+        w = int(request.args['w'])
+        h = int(request.args['h'])
+    except (KeyError, ValueError):
+        return send_from_directory('.', filename)
+
+    try:
+        im = Image.open(filename)
+        im.thumbnail((w, h), Image.ANTIALIAS)
+        io = StringIO.StringIO()
+        im.save(io, format='JPEG')
+        return Response(io.getvalue(), mimetype='image/jpeg')
+
+    except IOError:
+        abort(404)
+
+    return send_from_directory('.', filename)
+
+@app.route('/screenshots/<commit_sha>')
+def screenshots(commit_sha):
+    images = []
+    screenshots_dir = os.environ.get("HOME") + "/buildMessages/" + commit_sha + "/screenshots"
+
+    for root, dirs, files in os.walk(screenshots_dir):
+        files.sort()
+
+        for filename in [os.path.join(root, name) for name in files]:
+            if not filename.endswith('.png'):
+                continue
+
+            im = Image.open(filename)
+            w, h = im.size
+            aspect = 1.0 * w / h
+
+            if aspect > 1.0 * WIDTH / HEIGHT:
+                width = min(w, WIDTH)
+                height = width / aspect
+            else:
+                height = min(h, HEIGHT)
+                width = height * aspect
+
+            images.append({
+                'width': int(width),
+                'height': int(height),
+                'src': filename
+            })
+
+    html_page = render_template("serve_index.html", **{
+        'images': images
+    })
+
+    return html_page
 
 
 def get_signature(secret, payload):
