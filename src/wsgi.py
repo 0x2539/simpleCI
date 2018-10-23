@@ -222,8 +222,10 @@ def screenshots(commit_sha):
                 continue
 
             images.append({
-                'src': filename
+                'src': filename.replace(os.environ.get("HOME"), '')
             })
+
+    print(images)
 
     html_page = render_template("serve_index.html", **{
         'images': images
