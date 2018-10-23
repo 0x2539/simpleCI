@@ -225,8 +225,6 @@ def serve_images(commit_sha):
                 'src': filename.replace(os.environ.get("HOME"), '')
             })
 
-    print(images)
-
     html_page = render_template("serve_index.html", **{
         'images': images
     })
