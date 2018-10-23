@@ -209,8 +209,8 @@ def health_check():
 def image(filename):
     return send_from_directory('.', filename)
 
-@app.route('/screenshots/<commit_sha>')
-def screenshots(commit_sha):
+@app.route('/serve_images/<commit_sha>')
+def serve_images(commit_sha):
     images = []
     screenshots_dir = os.environ.get("HOME") + "/buildMessages/" + commit_sha + "/screenshots"
 
