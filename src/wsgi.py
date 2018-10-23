@@ -205,9 +205,6 @@ def push():
 def health_check():
     return Response('', status=200)
 
-WIDTH = 640
-HEIGHT = 480
-
 @app.route('/<path:filename>')
 def image(filename):
     return send_from_directory('.', filename)
@@ -224,20 +221,7 @@ def screenshots(commit_sha):
             if not filename.endswith('.png'):
                 continue
 
-            im = Image.open(filename)
-            w, h = im.size
-            aspect = 1.0 * w / h
-
-            if aspect > 1.0 * WIDTH / HEIGHT:
-                width = min(w, WIDTH)
-                height = width / aspect
-            else:
-                height = min(h, HEIGHT)
-                width = height * aspect
-
             images.append({
-                'width': int(width),
-                'height': int(height),
                 'src': filename
             })
 
