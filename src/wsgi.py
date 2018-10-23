@@ -99,7 +99,7 @@ def push():
     signature = request.headers.get('X-Hub-Signature')
 
     if not signature:
-        print("No signature for %{commit_sha}s" % vars())
+        print("No signature for " + str(commit_sha))
 
         return Response(
             json.dumps({'message': 'missing signature header'}),
@@ -109,7 +109,7 @@ def push():
 
     secret = os.environ.get('GITHUB_SECRET')
     if not secret:
-        print("Missing secret for %{commit_sha}s" % vars())
+        print("Missing secret for " + str(commit_sha))
 
         return Response(
             json.dumps({'message': 'missing secret environment variable'}),
@@ -120,7 +120,7 @@ def push():
     payload = json.dumps(pull_request, separators=(',', ':'))
 
     if get_signature(secret, payload) != signature:
-        print("Bad credentials. Failed signature matching for %{commit_sha}s" % vars())
+        print("Bad credentials. Failed signature matching for " + str(commit_sha))
 
         return Response(
             json.dumps({'message': 'bad credentials'}),
@@ -129,7 +129,7 @@ def push():
         )
 
     if not pull_request.get('action'):
-        print("Skipping tests. No action found for %{commit_sha}s" % vars())
+        print("Skipping tests. No action found for " + str(commit_sha))
 
         return Response(
             json.dumps({'message': "skipping tests, didn't find any action"}),
@@ -144,7 +144,7 @@ def push():
         run_tests = True
 
     if not run_tests:
-        print("Skipping tests. No action found for %{pull_request_number}s" % vars())
+        print("Skipping tests. No action found for " + str(pull_request_number))
 
         return Response(
             json.dumps({'message': "skipping tests, didn't find any new commits"}),
@@ -160,13 +160,13 @@ def push():
     if os.path.exists(commit_folder):
         shutil.rmtree(commit_folder)
 
-    print("Created commit folder for %{commit_sha}s" %vars())
+    print("Created commit folder for " + str(commit_sha))
 
     os.makedirs(commit_folder, exist_ok=True)
     script_out_file = f"{script_out_folder}/{commit_sha}/debug"
     git_token = os.environ.get('gitToken')
     if not git_token:
-        print("Git token missing for %{commit_sha}s" % vars())
+        print("Git token missing for " + str(commit_sha))
 
         with open(script_out_file, 'w') as outfile:
             outfile.write(
@@ -177,7 +177,7 @@ def push():
     if os.environ.get('SYNC') == "true":
         commit_pr = CommitPrModel(commit_sha, pull_request_number, script_out_file)
         singleton.add_commit_pr(commit_pr)
-        print("%{commit_sha}s added to queue" %vars())
+        print(str(commit_sha) + " added to queue")
 
         return Response(
             json.dumps({'message': "Added to queue: " + str(commit_pr.commit_sha)}),
@@ -185,7 +185,7 @@ def push():
             mimetype='application/json',
         )
 
-    print("Running async for %{commit_sha}s" %vars())
+    print("Running async for " + str(commit_sha))
 
     with open(script_out_file, 'w') as outfile:
         pid = Popen(
