@@ -147,6 +147,10 @@
     </div>
 
     <script>
+        window.onload = function(){
+            document.getElementById("webDesktopButton").click();
+        }
+
         function openTab(evt, tabName) {
             var i, tabcontent, tablinks;
             tabcontent = document.getElementsByClassName("tabcontent");
@@ -165,9 +169,6 @@
         document.getElementById("modalDiv").innerHTML = "<img src=" + src+ " >"
         }
     </script>
-    $( document ).ready(function() {
-        $( "#webDesktopButton" ).trigger( "click" );
-    });
     <script src="https://code.jquery.com/jquery-1.12.2.min.js" integrity="sha256-lZFHibXzMHo3GGeehn1hudTAP3Sc0uKXBXAzHX1sjtk=" crossorigin="anonymous"></script>
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </body>
