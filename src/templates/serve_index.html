@@ -12,24 +12,20 @@
             margin: 0;
             background-color: #333;
         }
-        .image {
-            background-color: #444;
+
+        .img-thumbnail {
+	        width:300px;
         }
 
-        .container {
-            margin: 4em;
+        .li-layout {
             display: inline-block;
+            margin: 2em;
         }
 
         .title {
             font-size: 40px;
             text-align: center;
             color: grey;
-        }
-
-        .filename{
-            font-size: 20px;
-            color:white;
         }
 
         /* Style the tab */
@@ -72,7 +68,7 @@
 <body>
     <div class="tab">
         <button class="tablinks" onclick="openTab(event, 'webMobile')">webMobile</button>
-        <button class="tablinks" onclick="openTab(event, 'webDesktop')">webDesktop</button>
+        <button id='webDesktopButton' class="tablinks" onclick="openTab(event, 'webDesktop')">webDesktop</button>
         <button class="tablinks" onclick="openTab(event, 'ios')">ios</button>
         <button class="tablinks" onclick="openTab(event, 'android')">android</button>
         <div class="title">Screenshots</div>
@@ -81,21 +77,12 @@
 
     <div class="container">
         <div class="row">
-          <div class="col-sm-10 center-block center-text">
-
-            <!--THUMBNAILS-->
+          <div class="center-block center-text">
             <ul class="list-inline">
-                <!--<li data-toggle="modal" data-target="#myModal">-->
-                    <!--<a  href="#myCarousel" data-slide-to="0">-->
-                        <!--<img class="img-thumbnail" src="https://dummyimage.com/200x133/000/fff" alt="...">-->
-                        <!--<br>-->
-                        <!--Caption-->
-                    <!--</a>-->
-                <!--</li>-->
                 <div id="webMobile" class="tabcontent">
                     {% for image in images %}
                         {% if 'webMobile' in image.display_name %}
-                            <li data-toggle="modal" data-target="#myModal">
+                            <li onclick="setImg('{{ image.src }}')" class="li-layout" data-toggle="modal" data-target="#myModal">
                                 <a  href="#myCarousel" data-slide-to="1">
                                     <img class="img-thumbnail" src="{{ image.src }}" alt="...">
                                     <br>
@@ -107,7 +94,7 @@
                 <div id="webDesktop" class="tabcontent">
                     {% for image in images %}
                         {% if 'webDesktop' in image.display_name %}
-                            <li data-toggle="modal" data-target="#myModal">
+                            <li onclick="setImg('{{ image.src }}')" class="li-layout" data-toggle="modal" data-target="#myModal">
                                 <a  href="#myCarousel" data-slide-to="1">
                                     <img class="img-thumbnail" src="{{ image.src }}" alt="...">
                                     <br>
@@ -119,7 +106,7 @@
                 <div id="ios" class="tabcontent">
                     {% for image in images %}
                         {% if 'ios' in image.display_name %}
-                                <li data-toggle="modal" data-target="#myModal">
+                                <li onclick="setImg('{{ image.src }}')" class="li-layout" data-toggle="modal" data-target="#myModal">
                                     <a  href="#myCarousel" data-slide-to="1">
                                         <img class="img-thumbnail" src="{{ image.src }}" alt="...">
                                         <br>
@@ -131,106 +118,56 @@
                 <div id="android" class="tabcontent">
                     {% for image in images %}
                         {% if 'android' in image.display_name %}
-                            <li data-toggle="modal" data-target="#myModal">
+                            <li onclick="setImg('{{ image.src }}')" class="li-layout" data-toggle="modal" data-target="#myModal">
                                 <a  href="#myCarousel" data-slide-to="1">
                                     <img class="img-thumbnail" src="{{ image.src }}" alt="...">
                                     <br>
                                     {{ image.display_name }}</a>
                             </li>
                         {% endif %}
-                    {% endfor %}<!--end of thumbnails-->
+                    {% endfor %}
                 </div>
             </ul>
 
-            <!--begin modal window-->
             <div class="modal fade" id="myModal">
-                <div class="modal-dialog">
+                <div class="modal-dialog modal-lg">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <div class="pull-left">My Gallery Title</div>
+                            <div class="pull-left">Screenshot modal</div>
                             <button type="button" class="close" data-dismiss="modal" title="Close"> <span class="glyphicon glyphicon-remove"></span></button>
                         </div>
 
                         <div class="clearfix"></div>
-                        <div class="modal-body">
-
-                            <!--CAROUSEL CODE GOES HERE-->
-                            <div id="myCarousel" class="carousel slide" data-interval="false">
-                                <div class="carousel-inner">
-                                    <!--div class="item active"> <img src="https://dummyimage.com/600x400/000/fff" alt="item0"></div-->
-                                    <div class="item active">
-                                       <img src="{{ images[0].src }}" width="640" height="480">
-                                            <div class="carousel-caption">
-                                                <p>{{ images[0].display_name }}</p>
-                                            </div>
-                                    </div>
-
-                                    {% for image in images[1:] %}
-                                        {% if 'webDesktop' in image.display_name %}
-                                            <div class="item">
-                                               <img src="{{ image.src }}">
-                                                    <div class="carousel-caption">
-                                                        <p>{{ images[0].display_name }}</p>
-                                                    </div>
-                                            </div>
-                                        {% endif %}
-                                    {% endfor %}
-                            </div>
-                            <!--end carousel-inner--></div>
-
-                            <!--Begin Previous and Next buttons-->
-                            <a class="left carousel-control" href="#myCarousel" role="button" data-slide="prev">
-                                <span class="glyphicon glyphicon-chevron-left"></span>
-                            </a>
-                            <a class="right carousel-control" href="#myCarousel" role="button" data-slide="next">
-                                <span class="glyphicon glyphicon-chevron-right"></span>
-                            </a>
-                            <!--end carousel-->
-                        </div>
-                        <!--end modal-body--></div>
-
-                        <div class="modal-footer">
-                            <div class="pull-left"> <small>Placeholder Images from <a href="https://dummyimage.com" target="new">DummyImage.com</a></small> </div>
-                            <button class="btn-sm close" type="button" data-dismiss="modal">Close</button>
-                            <div class="clearfix"></div>
-
-                        <!--end modal-footer-->
-                        </div>
-
-                    <!--end modal-content-->
+                        <div id="modalDiv" class="modal-body"></div>
                     </div>
-
-                <!--end modal-dialoge-->
                 </div>
-
-            <!--end myModal-->
             </div>
-
-           <!--end col-->
-           </div>
-
-        <!--end row-->
+          </div>
         </div>
-    <!--end container-->
     </div>
 
     <script>
-    function openTab(evt, cityName) {
-        var i, tabcontent, tablinks;
-        tabcontent = document.getElementsByClassName("tabcontent");
-        for (i = 0; i < tabcontent.length; i++) {
-            tabcontent[i].style.display = "none";
+        function openTab(evt, tabName) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+            tablinks = document.getElementsByClassName("tablinks");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.className += " active";
         }
-        tablinks = document.getElementsByClassName("tablinks");
-        for (i = 0; i < tablinks.length; i++) {
-            tablinks[i].className = tablinks[i].className.replace(" active", "");
+
+        function setImg(src) {
+        document.getElementById("modalDiv").innerHTML = "<img src=" + src+ " >"
         }
-        document.getElementById(cityName).style.display = "block";
-        evt.currentTarget.className += " active";
-    }
     </script>
-    <!--latest jQuery-->
+    $( document ).ready(function() {
+        $( "#webDesktopButton" ).trigger( "click" );
+    });
     <script src="https://code.jquery.com/jquery-1.12.2.min.js" integrity="sha256-lZFHibXzMHo3GGeehn1hudTAP3Sc0uKXBXAzHX1sjtk=" crossorigin="anonymous"></script>
-    <!--Bootstrap-->
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </body>

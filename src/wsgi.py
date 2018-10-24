@@ -205,10 +205,6 @@ def push():
 def health_check():
     return Response('', status=200)
 
-@app.route('/<path:filename>')
-def image(filename):
-    return send_from_directory('.', filename)
-
 @app.route('/serve_images/<commit_sha>')
 def serve_images(commit_sha):
     images = []
