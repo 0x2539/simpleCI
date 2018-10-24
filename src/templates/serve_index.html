@@ -12,8 +12,6 @@
             margin: 2em auto;
             margin-top:0;
             background-color: #444;
-            display: flex;
-            justify-content: center;
         }
 
         .title {
@@ -24,23 +22,122 @@
 
         .filename{
             font-size: 20px;
-            text-align: center;
-            color:white
+            color:white;
         }
 
-        img {
-            display: block;
-            text-align: center;
+        /* Style the tab */
+        .tab {
+            overflow: hidden;
+            border: 1px solid #ccc;
+            background-color: #f1f1f1;
+        }
+
+        /* Style the buttons inside the tab */
+        .tab button {
+            background-color: inherit;
+            float: right;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 14px 16px;
+            transition: 0.3s;
+            font-size: 17px;
+        }
+
+        /* Change background color of buttons on hover */
+        .tab button:hover {
+            background-color: #ddd;
+        }
+
+        /* Create an active/current tablink class */
+        .tab button.active {
+            background-color: #ccc;
+        }
+
+        /* Style the tab content */
+        .tabcontent {
+            display: none;
+            padding: 6px 12px;
+            border-top: none;
         }
     </style>
 </head>
 <body>
-    <div class="title">SCREENSHOTS</div>
-    <br>
+    <div class="tab">
+        <button class="tablinks" onclick="openTab(event, 'webMobile')">webMobile</button>
+        <button class="tablinks" onclick="openTab(event, 'webDesktop')">webDesktop</button>
+        <button class="tablinks" onclick="openTab(event, 'ios')">ios</button>
+        <button class="tablinks" onclick="openTab(event, 'android')">android</button>
+        <div class="title">Screenshots</div>
+
+    </div>
+
+    <div id="android" class="tabcontent">
     {% for image in images %}
-        <div class="filename"> {{ image.src }}</div>
-        <a class="image" href="{{ image.src }}">
-            <img src="{{ image.src }}"/>
-        </a>
+        {% if 'android' in image.display_name %}
+            <div style="display: inline-block;">
+                <a class="image" href="{{ image.src }}">
+                    <div class="filename"> {{ image.display_name }}</div>
+                    <img src="{{ image.src }}" width="640" height="480"/>
+                </a>
+            </div>
+        {% endif %}
     {% endfor %}
+    </div>
+
+    <div id="ios" class="tabcontent">
+    {% for image in images %}
+        {% if 'ios' in image.display_name %}
+            <div style="display: inline-block;">
+                <a class="image" href="{{ image.src }}">
+                    <div class="filename"> {{ image.display_name }}</div>
+                    <img src="{{ image.src }}" width="640" height="480"/>
+                </a>
+            </div>
+        {% endif %}
+    {% endfor %}
+    </div>
+
+    <div id="webDesktop" class="tabcontent">
+    {% for image in images %}
+        {% if 'webDesktop' in image.display_name %}
+            <div style="display: inline-block;">
+                <a class="image" href="{{ image.src }}">
+                    <div class="filename"> {{ image.display_name }}</div>
+                    <img src="{{ image.src }}" width="640" height="480"/>
+                </a>
+            </div>
+        {% endif %}
+    {% endfor %}
+    </div>
+
+    <div id="webMobile" class="tabcontent">
+    {% for image in images %}
+        {% if 'webMobile' in image.display_name %}
+            <div style="display: inline-block;">
+                <a class="image" href="{{ image.src }}">
+                    <div class="filename"> {{ image.display_name }}</div>
+                    <img src="{{ image.src }}" width="640" height="480"/>
+                </a>
+            </div>
+        {% endif %}
+    {% endfor %}
+    </div>
+
+
+<script>
+function openTab(evt, cityName) {
+    var i, tabcontent, tablinks;
+    tabcontent = document.getElementsByClassName("tabcontent");
+    for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+    }
+    tablinks = document.getElementsByClassName("tablinks");
+    for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+    document.getElementById(cityName).style.display = "block";
+    evt.currentTarget.className += " active";
+}
+</script>
 </body>

@@ -222,7 +222,8 @@ def serve_images(commit_sha):
                 continue
 
             images.append({
-                'src': filename.replace(os.environ.get("HOME"), '')
+                'src': filename.replace(os.environ.get("HOME"), ''),
+                'display_name': filename.replace(screenshots_dir, '')
             })
 
     html_page = render_template("serve_index.html", **{
