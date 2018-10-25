@@ -42,7 +42,7 @@ class __CommitPrQueueThread(object):
 
         git_token = os.environ.get('gitToken')
         if not git_token:
-            print("Git token missing for %{commit_pr_model.commit_sha}s" % vars())
+            print("Git token missing for commit: " + commit_pr_model.commit_sha)
 
             with open(commit_pr_model.script_out_file, 'w') as outfile:
                 outfile.write(
