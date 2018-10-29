@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta charset="utf-8" />
+    <!--Bootstrap-->
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <!--Latest stable release of jQuery Core Library-->
+    <script src="https://code.jquery.com/jquery-1.12.2.min.js" integrity="sha256-lZFHibXzMHo3GGeehn1hudTAP3Sc0uKXBXAzHX1sjtk=" crossorigin="anonymous"></script>
+    <style>
+        body {
+            margin: 0;
+            background-color: #333;
+        }
+
+        .img-thumbnail {
+	        width:300px;
+        }
+
+        .li-layout {
+            display: inline-block;
+            margin: 2em;
+        }
+
+        .title {
+            font-size: 40px;
+            text-align: center;
+            color: grey;
+        }
+
+        /* Style the tab */
+        .tab {
+            overflow: hidden;
+            border: 1px solid #ccc;
+            background-color: #f1f1f1;
+        }
+
+        /* Style the buttons inside the tab */
+        .tab button {
+            background-color: inherit;
+            float: right;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 14px 16px;
+            transition: 0.3s;
+            font-size: 17px;
+        }
+
+        /* Change background color of buttons on hover */
+        .tab button:hover {
+            background-color: #ddd;
+        }
+
+        /* Create an active/current tablink class */
+        .tab button.active {
+            background-color: #ccc;
+        }
+
+        /* Style the tab content */
+        .tabcontent {
+            display: none;
+            padding: 6px 12px;
+            border-top: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="tab">
+        <button class="tablinks" onclick="openTab(event, 'webMobile')">webMobile</button>
+        <button id='webDesktopButton' class="tablinks" onclick="openTab(event, 'webDesktop')">webDesktop</button>
+        <button class="tablinks" onclick="openTab(event, 'ios')">ios</button>
+        <button class="tablinks" onclick="openTab(event, 'android')">android</button>
+        <div class="title">Screenshots</div>
+
+    </div>
+
+    <div class="container">
+        <div class="row">
+          <div class="center-block center-text">
+            <ul class="list-inline">
+                <div id="webMobile" class="tabcontent">
+                    {% for image in images %}
+                        {% if 'webMobile' in image.display_name %}
+                            <li onclick="setImg('{{ image.src }}')" class="li-layout" data-toggle="modal" data-target="#myModal">
+                                <a  href="#myCarousel" data-slide-to="1">
+                                    <img class="img-thumbnail" src="{{ image.src }}" alt="...">
+                                    <br>
+                                    {{ image.display_name }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <div id="webDesktop" class="tabcontent">
+                    {% for image in images %}
+                        {% if 'webDesktop' in image.display_name %}
+                            <li onclick="setImg('{{ image.src }}')" class="li-layout" data-toggle="modal" data-target="#myModal">
+                                <a  href="#myCarousel" data-slide-to="1">
+                                    <img class="img-thumbnail" src="{{ image.src }}" alt="...">
+                                    <br>
+                                    {{ image.display_name }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <div id="ios" class="tabcontent">
+                    {% for image in images %}
+                        {% if 'ios' in image.display_name %}
+                                <li onclick="setImg('{{ image.src }}')" class="li-layout" data-toggle="modal" data-target="#myModal">
+                                    <a  href="#myCarousel" data-slide-to="1">
+                                        <img class="img-thumbnail" src="{{ image.src }}" alt="...">
+                                        <br>
+                                        {{ image.display_name }}</a>
+                                </li>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <div id="android" class="tabcontent">
+                    {% for image in images %}
+                        {% if 'android' in image.display_name %}
+                            <li onclick="setImg('{{ image.src }}')" class="li-layout" data-toggle="modal" data-target="#myModal">
+                                <a  href="#myCarousel" data-slide-to="1">
+                                    <img class="img-thumbnail" src="{{ image.src }}" alt="...">
+                                    <br>
+                                    {{ image.display_name }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </ul>
+
+            <div class="modal fade" id="myModal">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <div class="pull-left">Screenshot modal</div>
+                            <button type="button" class="close" data-dismiss="modal" title="Close"> <span class="glyphicon glyphicon-remove"></span></button>
+                        </div>
+
+                        <div class="clearfix"></div>
+                        <div id="modalDiv" class="modal-body"></div>
+                    </div>
+                </div>
+            </div>
+          </div>
+        </div>
+    </div>
+
+    <script>
+        window.onload = function(){
+            document.getElementById("webDesktopButton").click();
+        }
+
+        function openTab(evt, tabName) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+            tablinks = document.getElementsByClassName("tablinks");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.className += " active";
+        }
+
+        function setImg(src) {
+        document.getElementById("modalDiv").innerHTML = "<img src=" + src+ " >"
+        }
+    </script>
+    <script src="https://code.jquery.com/jquery-1.12.2.min.js" integrity="sha256-lZFHibXzMHo3GGeehn1hudTAP3Sc0uKXBXAzHX1sjtk=" crossorigin="anonymous"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</body>

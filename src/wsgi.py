@@ -1,13 +1,14 @@
 import json
 import os
 import shutil
-from flask import Flask, Response, request
+from flask import Flask, Response, request, abort, render_template, send_from_directory
 from pathlib import Path
 from subprocess import Popen, STDOUT
 from hmac import HMAC
 import hashlib
 from tests_queue import get_commit_pr_queue_singleton
 from commit_pr_model import CommitPrModel
+from io import StringIO
 
 singleton = get_commit_pr_queue_singleton()
 app = Flask(__name__)
@@ -89,38 +90,47 @@ def remove_commits():
 
 @app.route('/pull-request', methods=['POST'])
 def push():
-    print("Intrat")
+    print("Endpoint hit")
+    pull_request = request.get_json()
+
+    commit_sha = pull_request['pull_request']['head']['sha']
+    pull_request_number = pull_request['pull_request']['number']
+
     signature = request.headers.get('X-Hub-Signature')
 
     if not signature:
+        print("No signature for " + str(commit_sha))
+
         return Response(
             json.dumps({'message': 'missing signature header'}),
             status=403,
             mimetype='application/json',
         )
-    print("Passed signature")
 
     secret = os.environ.get('GITHUB_SECRET')
     if not secret:
+        print("Missing secret for " + str(commit_sha))
+
         return Response(
             json.dumps({'message': 'missing secret environment variable'}),
             status=403,
             mimetype='application/json',
         )
-    print("Passed secret")
 
-    pull_request = request.get_json()
     payload = json.dumps(pull_request, separators=(',', ':'))
 
     if get_signature(secret, payload) != signature:
+        print("Bad credentials. Failed signature matching for " + str(commit_sha))
+
         return Response(
             json.dumps({'message': 'bad credentials'}),
             status=403,
             mimetype='application/json',
         )
-    print("Passed signature matching")
 
     if not pull_request.get('action'):
+        print("Skipping tests. No action found for " + str(commit_sha))
+
         return Response(
             json.dumps({'message': "skipping tests, didn't find any action"}),
             status=200,
@@ -134,16 +144,13 @@ def push():
         run_tests = True
 
     if not run_tests:
+        print("Skipping tests. No action found for " + str(pull_request_number))
+
         return Response(
             json.dumps({'message': "skipping tests, didn't find any new commits"}),
             status=200,
             mimetype='application/json',
         )
-
-    print("Passed run_tests")
-
-    commit_sha = pull_request['pull_request']['head']['sha']
-    pull_request_number = pull_request['pull_request']['number']
 
     script_out_folder = f"{str(Path.home())}/buildMessages"
     os.makedirs(script_out_folder, exist_ok=True)
@@ -153,22 +160,24 @@ def push():
     if os.path.exists(commit_folder):
         shutil.rmtree(commit_folder)
 
-    print("Created commit folder")
+    print("Created commit folder for " + str(commit_sha))
 
     os.makedirs(commit_folder, exist_ok=True)
     script_out_file = f"{script_out_folder}/{commit_sha}/debug"
     git_token = os.environ.get('gitToken')
     if not git_token:
+        print("Git token missing for " + str(commit_sha))
+
         with open(script_out_file, 'w') as outfile:
             outfile.write(
                 "git access token is missing, set it as environment variable or pass it as argument ('./run_tests.sh --gitToken=123' or 'export gitToken=123')")
         return Response(json.dumps({'message': "git access token not found"}), status=422, mimetype='application/json')
 
-    print("Git token ok")
 
     if os.environ.get('SYNC') == "true":
         commit_pr = CommitPrModel(commit_sha, pull_request_number, script_out_file)
         singleton.add_commit_pr(commit_pr)
+        print(str(commit_sha) + " added to queue")
 
         return Response(
             json.dumps({'message': "Added to queue: " + str(commit_pr.commit_sha)}),
@@ -176,7 +185,7 @@ def push():
             mimetype='application/json',
         )
 
-    print("Running async")
+    print("Running async for " + str(commit_sha))
 
     with open(script_out_file, 'w') as outfile:
         pid = Popen(
@@ -195,6 +204,29 @@ def push():
 @app.route('/health-check', methods=['GET'])
 def health_check():
     return Response('', status=200)
+
+@app.route('/serve_images/<commit_sha>')
+def serve_images(commit_sha):
+    images = []
+    screenshots_dir = os.environ.get("HOME") + "/buildMessages/" + commit_sha + "/screenshots"
+
+    for root, dirs, files in os.walk(screenshots_dir):
+        files.sort()
+
+        for filename in [os.path.join(root, name) for name in files]:
+            if not filename.endswith('.png'):
+                continue
+
+            images.append({
+                'src': filename.replace(os.environ.get("HOME"), ''),
+                'display_name': filename.replace(screenshots_dir, '')
+            })
+
+    html_page = render_template("serve_index.html", **{
+        'images': images
+    })
+
+    return html_page
 
 
 def get_signature(secret, payload):
