@@ -1,0 +1,15 @@
+version: "3.4"
+
+services:
+
+  screenshots-manager:
+    image: alexbuicescu/screenshots-manager
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+    ports:
+      - "9001:9001"
+    volumes:
+      - ./screenshots:/screenshots
+    environment:
+      PORT: 9001

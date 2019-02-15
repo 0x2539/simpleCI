@@ -2,4 +2,6 @@
 *pyc
 .idea
 env
+venv
 run_tests.sh
+screenshots
