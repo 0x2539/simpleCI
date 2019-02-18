@@ -60,3 +60,9 @@
     -d nginx
 
     ```
+
+1. Screenshots folder architecture:
+    1. screenshots/android/image.png
+    1. screenshots/ios/image.png
+    1. screenshots/webMobile/image.png
+    1. screenshots/webDesktop/image.png

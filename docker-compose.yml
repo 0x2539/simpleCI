@@ -1,0 +1,18 @@
+version: "3.4"
+
+services:
+
+  screenshots-manager:
+    image: alexbuicescu/screenshots-manager
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+    ports:
+      - "9001:9001"
+      - "9002:9002"
+    volumes:
+      - ./screenshots:/screenshots
+    environment:
+      PORT: 9001
+      FILE_SERVER_PORT: 9002
+      PYTHONUNBUFFERED: "TRUE"
