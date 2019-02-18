@@ -15,8 +15,8 @@ def health_check():
 def serve_images(commit_sha):
     images = []
     file_server_path = os.environ.get("FILE_SERVER_PATH")
-    serve_port = os.environ.get("FILE_SERVER_PORT")
     screenshots_dir = os.environ.get("SCREENSHOTS_PATH").format(commit_sha)
+    file_server_address = os.environ.get("FILE_SERVER_ADDRESS")
     print('searching in:', screenshots_dir)
 
     for root, dirs, files in os.walk(screenshots_dir):
@@ -28,7 +28,7 @@ def serve_images(commit_sha):
                 continue
 
             images.append({
-                'src': 'http://localhost:{}/{}'.format(serve_port, filename.replace(file_server_path, '', 1)),
+                'src': '{}/{}'.format(file_server_address, filename.replace(file_server_path, '', 1)),
                 'display_name': filename.replace(file_server_path, '')
             })
     print('found imags:', images)
