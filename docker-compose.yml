@@ -2,11 +2,24 @@ version: "3.4"
 
 services:
 
-  screenshots-manager:
-    image: alexbuicescu/screenshots-manager
+  simple-ci:
+    image: alexbuicescu/simple-ci
     build:
       context: ./
-      dockerfile: ./Dockerfile
+      dockerfile: ci.Dockerfile
+    ports:
+      - "9000:9000"
+    volumes:
+      - ./screenshots:/screenshots
+    environment:
+      PORT: 9000
+      PYTHONUNBUFFERED: "TRUE"
+
+  screenshots-local-server:
+    image: alexbuicescu/screenshots-local-server
+    build:
+      context: ./
+      dockerfile: screenshots.local.Dockerfile
     ports:
       - "9001:9001"
       - "9002:9002"
@@ -17,3 +30,19 @@ services:
       FILE_SERVER_PORT: 9002
       FILE_SERVER_ADDRESS: "http://localhost:9002"
       PYTHONUNBUFFERED: "TRUE"
+
+  screenshots-s3-server:
+    image: alexbuicescu/screenshots-s3-server
+    build:
+      context: ./
+      dockerfile: screenshots.s3.Dockerfile
+    ports:
+      - "9003:9003"
+    environment:
+      PORT: 9003
+      BUCKET_NAME: "my.bucket.name"
+      SCREENSHOTS_FOLDER_PREFIX: "path/to/screenshots/"
+      PYTHONUNBUFFERED: "TRUE"
+      AWS_ACCESS_KEY_ID: "$AWS_ACCESS_KEY_ID"
+      AWS_SECRET_ACCESS_KEY: "$AWS_SECRET_ACCESS_KEY"
+      AWS_DEFAULT_REGION: "$AWS_DEFAULT_REGION"

@@ -6,8 +6,8 @@ from pathlib import Path
 from subprocess import Popen, STDOUT
 from hmac import HMAC
 import hashlib
-from tests_queue import get_commit_pr_queue_singleton
-from commit_pr_model import CommitPrModel
+from src.ci.tests_queue import get_commit_pr_queue_singleton
+from src.ci.commit_pr_model import CommitPrModel
 from io import StringIO
 
 singleton = get_commit_pr_queue_singleton()

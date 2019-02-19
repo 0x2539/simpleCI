@@ -9,3 +9,6 @@ chardet==3.0.4
 idna==2.7
 urllib3==1.23
 gunicorn==19.9.0
+
+# aws tools
+boto3==1.9.97
