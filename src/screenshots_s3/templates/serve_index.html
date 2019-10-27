@@ -164,11 +164,14 @@
                     {% endfor %}
                     {% for video in videos %}
                         {% if 'android' in video.src %}
-                            <li>
-                                <video width="240" height="320" autoplay>
-                                    <source src="{{ video.src }}" type="video/mp4">
-                                    Your browser does not support the video tag.
-                                </video>
+                            <li onclick="setVid('{{ video.src }}')" class="li-layout" data-toggle="modal"
+                                data-target="#myModal">
+                                <a href="#myCarousel" data-slide-to="1">
+                                    <video width="240" height="320" autoplay>
+                                        <source src="{{ video.src }}" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                </a>
                             </li>
                         {% endif %}
                     {% endfor %}
@@ -214,6 +217,12 @@
 
     function setImg(src) {
         document.getElementById("modalDiv").innerHTML = "<img src=" + src + " >"
+    }
+    function setVid(src) {
+        document.getElementById("modalDiv").innerHTML = `<video width="auto" height="auto" autoplay>
+                                        <source src="${src}" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>`;
     }
 </script>
 <script src="https://code.jquery.com/jquery-1.12.2.min.js"
