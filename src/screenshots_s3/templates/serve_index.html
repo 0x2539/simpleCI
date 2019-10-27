@@ -90,22 +90,30 @@
                 <div id="webMobile" class="tabcontent">
                     {% for image in images %}
                         {% if 'webMobile' in image.src %}
-                            <li onclick="setImg('{{ image.src }}')" class="li-layout" data-toggle="modal"
+                            <li onclick="setImg('{{ image.src }}', '{{ image.display_name }}')" class="li-layout"
+                                data-toggle="modal"
                                 data-target="#myModal">
                                 <a href="#myCarousel" data-slide-to="1">
                                     <img class="img-thumbnail" src="{{ image.src }}" alt="...">
                                     <br>
-                                    {{ image.display_name }}</a>
+                                    {{ image.display_name }}
+                                </a>
                             </li>
                         {% endif %}
                     {% endfor %}
                     {% for video in videos %}
                         {% if 'webMobile' in video.src %}
-                            <li>
-                                <video width="240" height="320">
-                                    <source src="{{ video.src }}" type="video/mp4">
-                                    Your browser does not support the video tag.
-                                </video>
+                            <li onclick="setVid('{{ video.src }}', '{{ video.display_name }}')" class="li-layout"
+                                data-toggle="modal"
+                                data-target="#myModal">
+                                <a href="#myCarousel" data-slide-to="1">
+                                    <video width="240" height="320">
+                                        <source src="{{ video.src }}" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                    <br>
+                                    {{ video.display_name }}
+                                </a>
                             </li>
                         {% endif %}
                     {% endfor %}
@@ -113,22 +121,30 @@
                 <div id="webDesktop" class="tabcontent">
                     {% for image in images %}
                         {% if 'webDesktop' in image.src %}
-                            <li onclick="setImg('{{ image.src }}')" class="li-layout" data-toggle="modal"
+                            <li onclick="setImg('{{ image.src }}', '{{ image.display_name }}')" class="li-layout"
+                                data-toggle="modal"
                                 data-target="#myModal">
                                 <a href="#myCarousel" data-slide-to="1">
                                     <img class="img-thumbnail" src="{{ image.src }}" alt="...">
                                     <br>
-                                    {{ image.display_name }}</a>
+                                    {{ image.display_name }}
+                                </a>
                             </li>
                         {% endif %}
                     {% endfor %}
                     {% for video in videos %}
                         {% if 'webDesktop' in video.src %}
-                            <li>
-                                <video width="240" height="320">
-                                    <source src="{{ video.src }}" type="video/mp4">
-                                    Your browser does not support the video tag.
-                                </video>
+                            <li onclick="setVid('{{ video.src }}', '{{ video.display_name }}')" class="li-layout"
+                                data-toggle="modal"
+                                data-target="#myModal">
+                                <a href="#myCarousel" data-slide-to="1">
+                                    <video width="240" height="320">
+                                        <source src="{{ video.src }}" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                    <br>
+                                    {{ video.display_name }}
+                                </a>
                             </li>
                         {% endif %}
                     {% endfor %}
@@ -136,22 +152,30 @@
                 <div id="ios" class="tabcontent">
                     {% for image in images %}
                         {% if 'ios' in image.src %}
-                            <li onclick="setImg('{{ image.src }}')" class="li-layout" data-toggle="modal"
+                            <li onclick="setImg('{{ image.src }}', '{{ image.display_name }}')" class="li-layout"
+                                data-toggle="modal"
                                 data-target="#myModal">
                                 <a href="#myCarousel" data-slide-to="1">
                                     <img class="img-thumbnail" src="{{ image.src }}" alt="...">
                                     <br>
-                                    {{ image.display_name }}</a>
+                                    {{ image.display_name }}
+                                </a>
                             </li>
                         {% endif %}
                     {% endfor %}
                     {% for video in videos %}
                         {% if 'ios' in video.src %}
-                            <li>
-                                <video width="240" height="320">
-                                    <source src="{{ video.src }}" type="video/mp4">
-                                    Your browser does not support the video tag.
-                                </video>
+                            <li onclick="setVid('{{ video.src }}', '{{ video.display_name }}')" class="li-layout"
+                                data-toggle="modal"
+                                data-target="#myModal">
+                                <a href="#myCarousel" data-slide-to="1">
+                                    <video width="240" height="320">
+                                        <source src="{{ video.src }}" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                    <br>
+                                    {{ video.display_name }}
+                                </a>
                             </li>
                         {% endif %}
                     {% endfor %}
@@ -159,24 +183,29 @@
                 <div id="android" class="tabcontent">
                     {% for image in images %}
                         {% if 'android' in image.src %}
-                            <li onclick="setImg('{{ image.src }}')" class="li-layout" data-toggle="modal"
+                            <li onclick="setImg('{{ image.src }}', '{{ image.display_name }}')" class="li-layout"
+                                data-toggle="modal"
                                 data-target="#myModal">
                                 <a href="#myCarousel" data-slide-to="1">
                                     <img class="img-thumbnail" src="{{ image.src }}" alt="...">
                                     <br>
-                                    {{ image.display_name }}</a>
+                                    {{ image.display_name }}
+                                </a>
                             </li>
                         {% endif %}
                     {% endfor %}
                     {% for video in videos %}
                         {% if 'android' in video.src %}
-                            <li onclick="setVid('{{ video.src }}')" class="li-layout" data-toggle="modal"
+                            <li onclick="setVid('{{ video.src }}', '{{ video.display_name }}')" class="li-layout"
+                                data-toggle="modal"
                                 data-target="#myModal">
                                 <a href="#myCarousel" data-slide-to="1">
                                     <video width="240" height="320">
                                         <source src="{{ video.src }}" type="video/mp4">
                                         Your browser does not support the video tag.
                                     </video>
+                                    <br>
+                                    {{ video.display_name }}
                                 </a>
                             </li>
                         {% endif %}
@@ -188,7 +217,7 @@
                 <div class="modal-dialog modal-lg">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <div class="pull-left">Screenshot modal</div>
+                            <div class="pull-left" id="modalTitle">Screenshot modal</div>
                             <button type="button" class="close" data-dismiss="modal" title="Close"><span
                                     class="glyphicon glyphicon-remove"></span></button>
                         </div>
@@ -221,11 +250,13 @@
         evt.currentTarget.className += " active";
     }
 
-    function setImg(src) {
+    function setImg(src, displayName) {
+        document.getElementById("modalTitle").innerHTML = `SS: ${displayName}`;
         document.getElementById("modalDiv").innerHTML = "<img src=" + src + " >"
     }
 
-    function setVid(src) {
+    function setVid(src, displayName) {
+        document.getElementById("modalTitle").innerHTML = `Video: ${displayName}`;
         document.getElementById("modalDiv").innerHTML = `
             <video id="modalVid" controls autoplay>
                 <source src="${src}" type="video/mp4">

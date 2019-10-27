@@ -41,7 +41,6 @@ def get_html_images(commit_sha):
 def get_html_videos(commit_sha):
     folder_prefix = '{}/{}/videos'.format(VIDEOS_FOLDER_PREFIX, commit_sha)
     all_files = list_s3_contents(BUCKET_NAME, folder_prefix)
-    print(all_files)
     videos = [{
         'src': 'http://{}.s3.eu-central-1.amazonaws.com/{}'.format(BUCKET_NAME, filename),
         'display_name': get_display_name(filename)
