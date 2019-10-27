@@ -75,14 +75,20 @@
             width: 100%;
             height: 100%;
         }
+
+        /* Style the screenshot from the modal */
+        #modalSS {
+            width: 100%;
+            height: 100%;
+        }
     </style>
 </head>
 <body>
 <div class="tab">
-    <button class="tablinks" onclick="openTab(event, 'webMobile')">webMobile</button>
-    <button id='webDesktopButton' class="tablinks" onclick="openTab(event, 'webDesktop')">webDesktop</button>
-    <button id='iosButton' class="tablinks" onclick="openTab(event, 'ios')">ios</button>
-    <button class="tablinks" onclick="openTab(event, 'android')">android</button>
+    <button id='webMobileButton' class="tablinks" onclick="openTab(event, 'webMobileButton')">webMobile</button>
+    <button id='webDesktopButton' class="tablinks" onclick="openTab(event, 'webDesktopButton')">webDesktop</button>
+    <button id='iosButton' class="tablinks" onclick="openTab(event, 'iosButton')">ios</button>
+    <button id='androidButton' class="tablinks" onclick="openTab(event, 'androidButton')">android</button>
     <div class="title">CI Artifacts</div>
 
 </div>
@@ -264,7 +270,7 @@
 
     function setImg(src, displayName) {
         document.getElementById("modalTitle").innerHTML = `SS: ${displayName}`;
-        document.getElementById("modalDiv").innerHTML = "<img src=" + src + " >"
+        document.getElementById("modalDiv").innerHTML = `<img id="modalSS" src=${src}/>`
     }
 
     function setVid(src, displayName) {
