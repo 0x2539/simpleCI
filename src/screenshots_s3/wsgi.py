@@ -23,6 +23,7 @@ def serve_images(commit_sha):
     html_page = render_template("serve_index.html", **{
         'images': get_html_images(commit_sha),
         'videos': get_html_videos(commit_sha),
+        'short_commit_hash': commit_sha[:5],
     })
 
     return html_page
