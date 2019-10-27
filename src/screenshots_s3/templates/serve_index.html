@@ -84,10 +84,10 @@
 </head>
 <body>
 <div class="tab">
-    <button id='webMobileButton' class="tablinks" onclick="openTab(event, 'webMobileButton')">webMobile</button>
-    <button id='webDesktopButton' class="tablinks" onclick="openTab(event, 'webDesktopButton')">webDesktop</button>
-    <button id='iosButton' class="tablinks" onclick="openTab(event, 'iosButton')">ios</button>
-    <button id='androidButton' class="tablinks" onclick="openTab(event, 'androidButton')">android</button>
+    <button id='webMobileButton' class="tablinks" onclick="openTab(event, 'webMobileContent')">webMobile</button>
+    <button id='webDesktopButton' class="tablinks" onclick="openTab(event, 'webDesktopContent')">webDesktop</button>
+    <button id='iosButton' class="tablinks" onclick="openTab(event, 'iosContent')">ios</button>
+    <button id='androidButton' class="tablinks" onclick="openTab(event, 'androidContent')">android</button>
     <div class="title">CI Artifacts</div>
 
 </div>
@@ -96,7 +96,7 @@
     <div class="row">
         <div class="center-block center-text">
             <ul class="list-inline">
-                <div id="webMobile" class="tabcontent">
+                <div id="webMobileContent" class="tabcontent">
                     {% for image in images %}
                         {% if 'webMobile' in image.src %}
                             <li onclick="setImg('{{ image.src }}', '{{ image.display_name }}')"
@@ -129,7 +129,7 @@
                         {% endif %}
                     {% endfor %}
                 </div>
-                <div id="webDesktop" class="tabcontent">
+                <div id="webDesktopContent" class="tabcontent">
                     {% for image in images %}
                         {% if 'webDesktop' in image.src %}
                             <li onclick="setImg('{{ image.src }}', '{{ image.display_name }}')"
@@ -162,7 +162,7 @@
                         {% endif %}
                     {% endfor %}
                 </div>
-                <div id="ios" class="tabcontent">
+                <div id="iosContent" class="tabcontent">
                     {% for image in images %}
                         {% if 'ios' in image.src %}
                             <li onclick="setImg('{{ image.src }}', '{{ image.display_name }}')"
@@ -195,7 +195,7 @@
                         {% endif %}
                     {% endfor %}
                 </div>
-                <div id="android" class="tabcontent">
+                <div id="androidContent" class="tabcontent">
                     {% for image in images %}
                         {% if 'android' in image.src %}
                             <li onclick="setImg('{{ image.src }}', '{{ image.display_name }}')"
