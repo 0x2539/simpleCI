@@ -64,6 +64,7 @@
 
         /* Style the tab content */
         .tabcontent {
+            display: none;
             grid-template: auto / auto auto auto;
             padding: 6px 12px;
             border-top: none;
@@ -71,15 +72,18 @@
 
         /* Style the video from the modal */
         #modalVid {
+            display: flex;
+            margin: auto;
             width: 100%;
             height: 100%;
-            max-height: 85vh;
+            max-height: 80vh;
         }
 
         /* Style the screenshot from the modal */
         #modalSS {
-            width: 100%;
-            height: 100%;
+            display: flex;
+            margin: auto;
+            max-height: 80vh;
         }
     </style>
 </head>
@@ -251,7 +255,7 @@
 
 <script>
     window.onload = function () {
-        document.getElementById("iosButton").click();
+        document.getElementById("androidButton").click();
     };
 
     function openTab(evt, tabName) {
