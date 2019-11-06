@@ -16,6 +16,7 @@ def health_check():
 BUCKET_NAME = os.getenv('BUCKET_NAME', '')
 SCREENSHOTS_FOLDER_PREFIX = os.getenv('SCREENSHOTS_FOLDER_PREFIX', '').rstrip('/')
 VIDEOS_FOLDER_PREFIX = os.getenv('VIDEOS_FOLDER_PREFIX', '').rstrip('/')
+LOGS_FOLDER_PREFIX = os.getenv('LOGS_FOLDER_PREFIX', '').rstrip('/')
 
 
 @app.route('/<commit_sha>')
@@ -23,6 +24,7 @@ def serve_images(commit_sha):
     html_page = render_template("serve_index.html", **{
         'images': get_html_images(commit_sha),
         'videos': get_html_videos(commit_sha),
+        'logs': get_html_logs(commit_sha),
         'short_commit_hash': commit_sha[:5],
     })
 
@@ -47,6 +49,16 @@ def get_html_videos(commit_sha):
         'display_name': get_display_name(filename)
     } for filename in all_files]
     return videos
+
+
+def get_html_logs(commit_sha):
+    folder_prefix = '{}/{}/logs'.format(LOGS_FOLDER_PREFIX, commit_sha)
+    all_files = list_s3_contents(BUCKET_NAME, folder_prefix)
+    logs = [{
+        'src': 'http://{}.s3.eu-central-1.amazonaws.com/{}'.format(BUCKET_NAME, filename),
+        'display_name': get_display_name(filename)
+    } for filename in all_files]
+    return logs
 
 
 def get_display_name(filename):

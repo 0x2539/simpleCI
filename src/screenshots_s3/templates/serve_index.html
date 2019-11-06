@@ -70,6 +70,12 @@
             border-top: none;
         }
 
+        /* Style the container of the logs */
+        #logs-container {
+            display: flex;
+            flex-direction: column;
+        }
+
         /* Style the video from the modal */
         #modalVid {
             display: flex;
@@ -232,6 +238,13 @@
                             </li>
                         {% endif %}
                     {% endfor %}
+                    <li class="li-layout" id="logs-container">
+                        {% for log in logs %}
+                            <a href="{{ log.src }}">
+                                {{ log.display_name }}
+                            </a>
+                        {% endfor %}
+                    </li>
                 </div>
             </ul>
 
