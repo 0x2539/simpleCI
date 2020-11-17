@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title></title>
-    <meta charset="utf-8" />
+    <title>CI Art {{ short_commit_hash }}</title>
+    <meta charset="utf-8"/>
     <!--Bootstrap-->
     <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <!--Latest stable release of jQuery Core Library-->
-    <script src="https://code.jquery.com/jquery-1.12.2.min.js" integrity="sha256-lZFHibXzMHo3GGeehn1hudTAP3Sc0uKXBXAzHX1sjtk=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-1.12.2.min.js"
+            integrity="sha256-lZFHibXzMHo3GGeehn1hudTAP3Sc0uKXBXAzHX1sjtk=" crossorigin="anonymous"></script>
     <style>
         body {
             margin: 0;
@@ -14,12 +15,16 @@
         }
 
         .img-thumbnail {
-	        width:300px;
+            width: 300px;
         }
 
         .li-layout {
             display: inline-block;
             margin: 2em;
+        }
+
+        .li-vid-layout {
+            background-color: #fff;
         }
 
         .title {
@@ -60,72 +65,186 @@
         /* Style the tab content */
         .tabcontent {
             display: none;
+            grid-template: auto / auto auto auto;
             padding: 6px 12px;
             border-top: none;
+        }
+
+        /* Style the container of the logs */
+        #logs-container {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Style the video from the modal */
+        #modalVid {
+            display: flex;
+            margin: auto;
+            width: 100%;
+            height: 100%;
+            max-height: 80vh;
+        }
+
+        /* Style the screenshot from the modal */
+        #modalSS {
+            display: flex;
+            margin: auto;
+            max-height: 80vh;
         }
     </style>
 </head>
 <body>
-    <div class="tab">
-        <button class="tablinks" onclick="openTab(event, 'webMobile')">webMobile</button>
-        <button id='webDesktopButton' class="tablinks" onclick="openTab(event, 'webDesktop')">webDesktop</button>
-        <button id='iosButton' class="tablinks" onclick="openTab(event, 'ios')">ios</button>
-        <button class="tablinks" onclick="openTab(event, 'android')">android</button>
-        <div class="title">Screenshots</div>
+<div class="tab">
+    <button id='webMobileButton' class="tablinks" onclick="openTab(event, 'webMobileContent')">webMobile</button>
+    <button id='webDesktopButton' class="tablinks" onclick="openTab(event, 'webDesktopContent')">webDesktop</button>
+    <button id='iosButton' class="tablinks" onclick="openTab(event, 'iosContent')">ios</button>
+    <button id='androidButton' class="tablinks" onclick="openTab(event, 'androidContent')">android</button>
+    <div class="title">CI Artifacts</div>
 
-    </div>
+</div>
 
-    <div class="container">
-        <div class="row">
-          <div class="center-block center-text">
+<div class="container">
+    <div class="row">
+        <div class="center-block center-text">
             <ul class="list-inline">
-                <div id="webMobile" class="tabcontent">
+                <div id="webMobileContent" class="tabcontent">
                     {% for image in images %}
-                        {% if 'webMobile' in image.display_name %}
-                            <li onclick="setImg('{{ image.src }}')" class="li-layout" data-toggle="modal" data-target="#myModal">
-                                <a  href="#myCarousel" data-slide-to="1">
+                        {% if 'webMobile' in image.src %}
+                            <li onclick="setImg('{{ image.src }}', '{{ image.display_name }}')"
+                                class="li-layout"
+                                data-toggle="modal"
+                                data-target="#myModal">
+                                <a href="#myCarousel" data-slide-to="1">
                                     <img class="img-thumbnail" src="{{ image.src }}" alt="...">
                                     <br>
-                                    {{ image.display_name }}</a>
+                                    {{ image.display_name }}
+                                </a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    {% for video in videos %}
+                        {% if 'webMobile' in video.src %}
+                            <li onclick="setVid('{{ video.src }}', '{{ video.display_name }}')"
+                                class="li-layout"
+                                data-toggle="modal"
+                                data-target="#myModal">
+                                <a href="#myCarousel" data-slide-to="1">
+                                    <video class="li-vid-layout" width="240" height="320">
+                                        <source src="{{ video.src }}" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                    <br>
+                                    {{ video.display_name }}
+                                </a>
                             </li>
                         {% endif %}
                     {% endfor %}
                 </div>
-                <div id="webDesktop" class="tabcontent">
+                <div id="webDesktopContent" class="tabcontent">
                     {% for image in images %}
-                        {% if 'webDesktop' in image.display_name %}
-                            <li onclick="setImg('{{ image.src }}')" class="li-layout" data-toggle="modal" data-target="#myModal">
-                                <a  href="#myCarousel" data-slide-to="1">
+                        {% if 'webDesktop' in image.src %}
+                            <li onclick="setImg('{{ image.src }}', '{{ image.display_name }}')"
+                                class="li-layout"
+                                data-toggle="modal"
+                                data-target="#myModal">
+                                <a href="#myCarousel" data-slide-to="1">
                                     <img class="img-thumbnail" src="{{ image.src }}" alt="...">
                                     <br>
-                                    {{ image.display_name }}</a>
+                                    {{ image.display_name }}
+                                </a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    {% for video in videos %}
+                        {% if 'webDesktop' in video.src %}
+                            <li onclick="setVid('{{ video.src }}', '{{ video.display_name }}')"
+                                class="li-layout"
+                                data-toggle="modal"
+                                data-target="#myModal">
+                                <a href="#myCarousel" data-slide-to="1">
+                                    <video class="li-vid-layout" width="240" height="320">
+                                        <source src="{{ video.src }}" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                    <br>
+                                    {{ video.display_name }}
+                                </a>
                             </li>
                         {% endif %}
                     {% endfor %}
                 </div>
-                <div id="ios" class="tabcontent">
+                <div id="iosContent" class="tabcontent">
                     {% for image in images %}
-                        {% if 'ios' in image.display_name %}
-                                <li onclick="setImg('{{ image.src }}')" class="li-layout" data-toggle="modal" data-target="#myModal">
-                                    <a  href="#myCarousel" data-slide-to="1">
-                                        <img class="img-thumbnail" src="{{ image.src }}" alt="...">
-                                        <br>
-                                        {{ image.display_name }}</a>
-                                </li>
-                        {% endif %}
-                    {% endfor %}
-                </div>
-                <div id="android" class="tabcontent">
-                    {% for image in images %}
-                        {% if 'android' in image.display_name %}
-                            <li onclick="setImg('{{ image.src }}')" class="li-layout" data-toggle="modal" data-target="#myModal">
-                                <a  href="#myCarousel" data-slide-to="1">
+                        {% if 'ios' in image.src %}
+                            <li onclick="setImg('{{ image.src }}', '{{ image.display_name }}')"
+                                class="li-layout"
+                                data-toggle="modal"
+                                data-target="#myModal">
+                                <a href="#myCarousel" data-slide-to="1">
                                     <img class="img-thumbnail" src="{{ image.src }}" alt="...">
                                     <br>
-                                    {{ image.display_name }}</a>
+                                    {{ image.display_name }}
+                                </a>
                             </li>
                         {% endif %}
                     {% endfor %}
+                    {% for video in videos %}
+                        {% if 'ios' in video.src %}
+                            <li onclick="setVid('{{ video.src }}', '{{ video.display_name }}')"
+                                class="li-layout"
+                                data-toggle="modal"
+                                data-target="#myModal">
+                                <a href="#myCarousel" data-slide-to="1">
+                                    <video class="li-vid-layout" width="240" height="320">
+                                        <source src="{{ video.src }}" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                    <br>
+                                    {{ video.display_name }}
+                                </a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <div id="androidContent" class="tabcontent">
+                    {% for image in images %}
+                        {% if 'android' in image.src %}
+                            <li onclick="setImg('{{ image.src }}', '{{ image.display_name }}')"
+                                class="li-layout"
+                                data-toggle="modal"
+                                data-target="#myModal">
+                                <a href="#myCarousel" data-slide-to="1">
+                                    <img class="img-thumbnail" src="{{ image.src }}" alt="...">
+                                    <br>
+                                    {{ image.display_name }}
+                                </a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    {% for video in videos %}
+                        {% if 'android' in video.src %}
+                            <li onclick="setVid('{{ video.src }}', '{{ video.display_name }}')"
+                                class="li-layout"
+                                data-toggle="modal"
+                                data-target="#myModal">
+                                <a href="#myCarousel" data-slide-to="1">
+                                    <video class="li-vid-layout" width="240" height="320">
+                                        <source src="{{ video.src }}" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                    <br>
+                                    {{ video.display_name }}
+                                </a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    <li class="li-layout" id="logs-container">
+                        {% for log in logs %}
+                            <a href="{{ log.src }}" target="#">
+                                {{ log.display_name }}
+                            </a>
+                        {% endfor %}
+                    </li>
                 </div>
             </ul>
 
@@ -133,8 +252,9 @@
                 <div class="modal-dialog modal-lg">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <div class="pull-left">Screenshot modal</div>
-                            <button type="button" class="close" data-dismiss="modal" title="Close"> <span class="glyphicon glyphicon-remove"></span></button>
+                            <div class="pull-left" id="modalTitle">Screenshot modal</div>
+                            <button type="button" class="close" data-dismiss="modal" title="Close"><span
+                                    class="glyphicon glyphicon-remove"></span></button>
                         </div>
 
                         <div class="clearfix"></div>
@@ -142,33 +262,45 @@
                     </div>
                 </div>
             </div>
-          </div>
         </div>
     </div>
+</div>
 
-    <script>
-        window.onload = function(){
-            document.getElementById("iosButton").click();
-        }
+<script>
+    window.onload = function () {
+        document.getElementById("androidButton").click();
+    };
 
-        function openTab(evt, tabName) {
-            var i, tabcontent, tablinks;
-            tabcontent = document.getElementsByClassName("tabcontent");
-            for (i = 0; i < tabcontent.length; i++) {
-                tabcontent[i].style.display = "none";
-            }
-            tablinks = document.getElementsByClassName("tablinks");
-            for (i = 0; i < tablinks.length; i++) {
-                tablinks[i].className = tablinks[i].className.replace(" active", "");
-            }
-            document.getElementById(tabName).style.display = "block";
-            evt.currentTarget.className += " active";
+    function openTab(evt, tabName) {
+        var i, tabcontent, tablinks;
+        tabcontent = document.getElementsByClassName("tabcontent");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
         }
+        tablinks = document.getElementsByClassName("tablinks");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace(" active", "");
+        }
+        document.getElementById(tabName).style.display = "grid";
+        evt.currentTarget.className += " active";
+    }
 
-        function setImg(src) {
-        document.getElementById("modalDiv").innerHTML = "<img src=" + src+ " >"
-        }
-    </script>
-    <script src="https://code.jquery.com/jquery-1.12.2.min.js" integrity="sha256-lZFHibXzMHo3GGeehn1hudTAP3Sc0uKXBXAzHX1sjtk=" crossorigin="anonymous"></script>
-    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    function setImg(src, displayName) {
+        document.getElementById("modalTitle").innerHTML = `SS: ${displayName}`;
+        document.getElementById("modalDiv").innerHTML = `<img id="modalSS" src=${src}>`
+    }
+
+    function setVid(src, displayName) {
+        document.getElementById("modalTitle").innerHTML = `Video: ${displayName}`;
+        document.getElementById("modalDiv").innerHTML = `
+            <video id="modalVid" controls autoplay>
+                <source src="${src}" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        `;
+    }
+</script>
+<script src="https://code.jquery.com/jquery-1.12.2.min.js"
+        integrity="sha256-lZFHibXzMHo3GGeehn1hudTAP3Sc0uKXBXAzHX1sjtk=" crossorigin="anonymous"></script>
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </body>

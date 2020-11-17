@@ -15,21 +15,55 @@ def health_check():
 
 BUCKET_NAME = os.getenv('BUCKET_NAME', '')
 SCREENSHOTS_FOLDER_PREFIX = os.getenv('SCREENSHOTS_FOLDER_PREFIX', '').rstrip('/')
+VIDEOS_FOLDER_PREFIX = os.getenv('VIDEOS_FOLDER_PREFIX', '').rstrip('/')
+LOGS_FOLDER_PREFIX = os.getenv('LOGS_FOLDER_PREFIX', '').rstrip('/')
 
 
 @app.route('/<commit_sha>')
 def serve_images(commit_sha):
-    folder_prefix = '{}/{}'.format(SCREENSHOTS_FOLDER_PREFIX, commit_sha)
-    all_files = list_s3_contents(BUCKET_NAME, folder_prefix)
-    print('found:')
-    print('\n'.join(all_files))
-    images = [{
-        'src': 'http://{}.s3.eu-central-1.amazonaws.com/{}'.format(BUCKET_NAME, filename),
-        'display_name': filename.replace(SCREENSHOTS_FOLDER_PREFIX, '', 1)
-    } for filename in all_files]
-
     html_page = render_template("serve_index.html", **{
-        'images': images
+        'images': get_html_images(commit_sha),
+        'videos': get_html_videos(commit_sha),
+        'logs': get_html_logs(commit_sha),
+        'short_commit_hash': commit_sha[:5],
     })
 
     return html_page
+
+
+def get_html_images(commit_sha):
+    folder_prefix = '{}/{}/screenshots'.format(SCREENSHOTS_FOLDER_PREFIX, commit_sha)
+    all_files = list_s3_contents(BUCKET_NAME, folder_prefix)
+    images = [{
+        'src': 'http://{}.s3.eu-central-1.amazonaws.com/{}'.format(BUCKET_NAME, filename),
+        'display_name': get_display_name(filename)
+    } for filename in all_files]
+    return images
+
+
+def get_html_videos(commit_sha):
+    folder_prefix = '{}/{}/videos'.format(VIDEOS_FOLDER_PREFIX, commit_sha)
+    all_files = list_s3_contents(BUCKET_NAME, folder_prefix)
+    videos = [{
+        'src': 'http://{}.s3.eu-central-1.amazonaws.com/{}'.format(BUCKET_NAME, filename),
+        'display_name': get_display_name(filename)
+    } for filename in all_files]
+    return videos
+
+
+def get_html_logs(commit_sha):
+    folder_prefix = '{}/{}/logs'.format(LOGS_FOLDER_PREFIX, commit_sha)
+    all_files = list_s3_contents(BUCKET_NAME, folder_prefix)
+    logs = [{
+        'src': 'http://{}.s3.eu-central-1.amazonaws.com/{}'.format(BUCKET_NAME, filename),
+        'display_name': get_display_name(filename)
+    } for filename in all_files]
+    return logs
+
+
+def get_display_name(filename):
+    # no_prefix = filename.replace(SCREENSHOTS_FOLDER_PREFIX, '', 1)
+    no_prefix = filename
+    no_commit_hash = no_prefix[no_prefix.find('/', 1):]
+    no_platform = no_commit_hash[no_commit_hash.find('/', 1):]
+    return no_platform
